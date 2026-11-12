@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { perfil } from '../data/perfil';
+---
+
+<BaseLayout title="Contacto">
+  <h1><span class="prompt">$</span> ./contactar.sh</h1>
+  <p class="lead">Si quieres hablar de prácticas, un proyecto o cualquier otra cosa, escríbeme.</p>
+
+  <ul class="contacto">
+    <li><span class="clave">email</span> <a href={`mailto:${perfil.email}`}>{perfil.email}</a></li>
+    <li><span class="clave">github</span> <a href={perfil.github} target="_blank" rel="noopener">{perfil.github.replace('https://', '')}</a></li>
+    {perfil.linkedin && (
+      <li><span class="clave">linkedin</span> <a href={perfil.linkedin} target="_blank" rel="noopener">{perfil.linkedin.replace('https://', '')}</a></li>
+    )}
+    <li><span class="clave">ubicación</span> {perfil.ubicacion}</li>
+  </ul>
+</BaseLayout>

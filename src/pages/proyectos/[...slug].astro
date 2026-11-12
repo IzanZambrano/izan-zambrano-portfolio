@@ -1,0 +1,34 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const proyectos = await getCollection('proyectos');
+  return proyectos.map((proyecto) => ({
+    params: { slug: proyecto.id },
+    props: { proyecto },
+  }));
+}
+
+const { proyecto } = Astro.props;
+const { Content } = await render(proyecto);
+const { titulo, descripcion, fecha, tecnologias, repo, demo } = proyecto.data;
+---
+
+<BaseLayout title={titulo} description={descripcion}>
+  <article class="proyecto">
+    <p><a href="/proyectos/">← cd ..</a></p>
+    <h1>{titulo}</h1>
+    <p class="card-fecha">{fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    <ul class="tags">
+      {tecnologias.map((t) => <li>{t}</li>)}
+    </ul>
+    <div class="acciones">
+      {repo && <a class="btn" href={repo} target="_blank" rel="noopener">Código</a>}
+      {demo && <a class="btn btn-sec" href={demo} target="_blank" rel="noopener">Demo</a>}
+    </div>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

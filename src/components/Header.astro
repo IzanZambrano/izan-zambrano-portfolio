@@ -1,0 +1,27 @@
+---
+const enlaces = [
+  { href: '/', texto: 'inicio' },
+  { href: '/proyectos/', texto: 'proyectos' },
+  { href: '/sobre-mi/', texto: 'sobre-mi' },
+  { href: '/contacto/', texto: 'contacto' },
+];
+
+const actual = Astro.url.pathname;
+const esActivo = (href: string) =>
+  href === '/' ? actual === '/' : actual.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo"><span class="prompt">izan@portfolio</span>:<span class="path">~</span>$</a>
+    <nav>
+      <ul>
+        {enlaces.map((e) => (
+          <li>
+            <a href={e.href} class={esActivo(e.href) ? 'activo' : ''}>./{e.texto}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

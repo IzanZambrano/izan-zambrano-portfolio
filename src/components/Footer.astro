@@ -1,0 +1,11 @@
+---
+import { perfil } from '../data/perfil';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>© {year} {perfil.nombre}</p>
+    <p class="muted">Hecho con Astro · Servido con Caddy en Docker · Desplegado con GitHub Actions</p>
+  </div>
+</footer>

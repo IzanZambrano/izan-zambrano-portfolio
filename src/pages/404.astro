@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404">
+  <section class="hero">
+    <p class="terminal-line"><span class="prompt">$</span> cd {Astro.url.pathname}</p>
+    <h1>404</h1>
+    <p class="lead">bash: cd: No such file or directory</p>
+    <a class="btn" href="/">Volver al inicio</a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,20 @@
+# Se ejecuta en el VPS, dentro de ~/portfolio/
+#   docker compose up -d
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: portfolio-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv:ro          # aquí copia GitHub Actions la carpeta dist/
+      - caddy_data:/data        # certificados HTTPS
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

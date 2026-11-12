@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { perfil, habilidades } from '../data/perfil';
+---
+
+<BaseLayout title="Sobre mí">
+  <h1><span class="prompt">$</span> cat sobre-mi.txt</h1>
+
+  <div class="prose">
+    <p>
+      Soy {perfil.nombre}, estudiante de Administración de Sistemas Informáticos en Red (ASIR).
+      <!-- TODO: cuenta aquí un poco más sobre ti: qué te gusta, qué estás aprendiendo, qué buscas. -->
+      Me gusta montar servicios, entender cómo funcionan por dentro y automatizar lo que se repite.
+    </p>
+    <p>
+      Este mismo portfolio es uno de mis proyectos: está en un VPS que administro yo, servido
+      con Caddy dentro de Docker, con HTTPS automático y desplegado con GitHub Actions en cada push.
+    </p>
+  </div>
+
+  <h2><span class="prompt">$</span> ls habilidades/</h2>
+  <div class="skills">
+    {habilidades.map((h) => (
+      <div class="skill-group">
+        <h3>{h.grupo}</h3>
+        <ul class="tags">
+          {h.items.map((i) => <li>{i}</li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+</BaseLayout>

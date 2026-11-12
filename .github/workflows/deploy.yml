@@ -1,0 +1,52 @@
+name: Build y despliegue
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Compilar la web
+        run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # El despliegue solo se ejecuta cuando hayas creado la variable DEPLOY_ENABLED=true
+    # en Settings → Secrets and variables → Actions → Variables (cuando tengas el VPS listo).
+    if: vars.DEPLOY_ENABLED == 'true'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Configurar clave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.SSH_PORT || 22 }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Copiar archivos al VPS
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p ${{ secrets.SSH_PORT || 22 }}" \
+            dist/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/portfolio/site/"
