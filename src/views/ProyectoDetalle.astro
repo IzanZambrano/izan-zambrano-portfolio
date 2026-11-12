@@ -1,0 +1,40 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EstadoBadge from '../components/EstadoBadge.astro';
+import { formatDate, otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+import type { Proyecto } from '../lib/proyectos';
+
+interface Props {
+  lang: Lang;
+  proyecto: Proyecto;
+}
+
+const { lang, proyecto: p } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await render(p.entry!);
+const alt = `${route('proyectos', otherLang(lang))}${p.slug}/`;
+---
+
+<BaseLayout lang={lang} alt={alt} title={p.titulo} description={p.descripcion}>
+  <article class="proyecto">
+    <p><a href={route('proyectos', lang)}>{t('proyecto.volver')}</a></p>
+    <h1>{p.titulo}</h1>
+    <div class="meta">
+      <EstadoBadge estado={p.estado} lang={lang} />
+      <span class="card-fecha">{formatDate(p.fecha, lang, true)}</span>
+    </div>
+    <p class="lead">{p.descripcion}</p>
+    <ul class="tags">
+      {p.tecnologias.map((tec) => <li>{tec}</li>)}
+    </ul>
+    <div class="acciones">
+      {p.repo && <a class="btn" href={p.repo} target="_blank" rel="noopener">{t('proyecto.codigo')}</a>}
+      {p.demo && <a class="btn btn-sec" href={p.demo} target="_blank" rel="noopener">{t('proyecto.demo')}</a>}
+    </div>
+    {p.sinTraducir && <p class="aviso">{t('proyecto.traduccionPendiente')}</p>}
+    <div class="prose" lang={p.sinTraducir ? 'es' : lang}>
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

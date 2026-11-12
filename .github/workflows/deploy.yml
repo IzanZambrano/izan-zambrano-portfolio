@@ -3,6 +3,11 @@ name: Build y despliegue
 on:
   push:
     branches: [main]
+  # Se recompila cada día a las 06:00 (hora de España en invierno) para importar
+  # los repositorios nuevos o actualizados de GitHub.
+  schedule:
+    - cron: '0 5 * * *'
+  # Botón "Run workflow" en la pestaña Actions para actualizar al momento.
   workflow_dispatch:
 
 jobs:
@@ -20,6 +25,9 @@ jobs:
 
       - name: Compilar la web
         run: npm run build
+        env:
+          # Token automático del workflow: evita el límite de peticiones de la API de GitHub.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v4
         with:

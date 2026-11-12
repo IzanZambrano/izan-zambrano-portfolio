@@ -2,6 +2,7 @@
 titulo: Portfolio autodesplegado en VPS
 descripcion: Esta misma web, servida con Caddy en Docker en un VPS propio y desplegada automáticamente con GitHub Actions.
 fecha: 2026-11-12
+estado: en-proceso
 tecnologias: [Astro, Docker, Caddy, GitHub Actions, Linux]
 repo: https://github.com/IzanZambrano/izan-zambrano-portfolio
 destacado: true
@@ -17,6 +18,8 @@ Mi portfolio personal. La web está hecha con **Astro** (genera HTML estático) 
 2. **GitHub Actions** compila la web (`npm run build`) y genera la carpeta `dist/`.
 3. El workflow copia `dist/` al servidor por **SSH con rsync**.
 4. **Caddy**, dentro de un contenedor **Docker**, sirve los archivos y gestiona el certificado **HTTPS** de Let's Encrypt automáticamente.
+
+Los repositorios públicos de mi GitHub se importan al compilar mediante la API de GitHub, y la web se recompila cada día, así que los proyectos nuevos aparecen solos.
 
 ## Seguridad del servidor
 

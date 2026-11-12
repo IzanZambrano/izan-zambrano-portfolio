@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+import { getProyectos } from '../lib/proyectos';
+import { ESTADOS } from '../lib/estados';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const proyectos = await getProyectos(lang);
+
+// Solo se muestran los filtros de estados que tienen algún proyecto.
+const conteo = Object.fromEntries(ESTADOS.map((e) => [e, proyectos.filter((p) => p.estado === e).length]));
+const estadosUsados = ESTADOS.filter((e) => conteo[e] > 0);
+---
+
+<BaseLayout lang={lang} alt={route('proyectos', otherLang(lang))} title={t('proyectos.titulo')}>
+  <h1><span class="prompt">$</span> {t('proyectos.cmd')}</h1>
+  <p class="lead">{t('proyectos.lead')}</p>
+
+  <div class="filtros" role="group">
+    <button type="button" class="filtro activo" data-filtro="todos">
+      {t('proyectos.filtro.todos')} <span class="muted">{proyectos.length}</span>
+    </button>
+    {estadosUsados.map((e) => (
+      <button type="button" class={`filtro filtro-${e}`} data-filtro={e}>
+        {t(`estado.${e}`)} <span class="muted">{conteo[e]}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="grid" id="lista-proyectos">
+    {proyectos.map((p) => <ProjectCard proyecto={p} lang={lang} />)}
+  </div>
+  <p class="muted" id="sin-proyectos" hidden>{t('proyectos.vacio')}</p>
+</BaseLayout>
+
+<script>
+  const botones = document.querySelectorAll<HTMLButtonElement>('.filtro');
+  const tarjetas = document.querySelectorAll<HTMLElement>('#lista-proyectos .card');
+  const vacio = document.getElementById('sin-proyectos');
+
+  botones.forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const filtro = boton.dataset.filtro;
+      botones.forEach((b) => b.classList.toggle('activo', b === boton));
+      let visibles = 0;
+      tarjetas.forEach((card) => {
+        const mostrar = filtro === 'todos' || card.dataset.estado === filtro;
+        card.hidden = !mostrar;
+        if (mostrar) visibles++;
+      });
+      if (vacio) vacio.hidden = visibles > 0;
+    });
+  });
+</script>

@@ -1,11 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { perfil } from '../data/perfil';
+import { perfil, perfilTextos } from '../data/perfil';
+import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
-<BaseLayout title="Contacto">
-  <h1><span class="prompt">$</span> ./contactar.sh</h1>
-  <p class="lead">Si quieres hablar de prácticas, un proyecto o cualquier otra cosa, escríbeme.</p>
+<BaseLayout lang={lang} alt={route('contacto', otherLang(lang))} title={t('contacto.titulo')}>
+  <h1><span class="prompt">$</span> {t('contacto.cmd')}</h1>
+  <p class="lead">{t('contacto.lead')}</p>
 
   <ul class="contacto">
     <li><span class="clave">email</span> <a href={`mailto:${perfil.email}`}>{perfil.email}</a></li>
@@ -13,6 +21,6 @@ import { perfil } from '../data/perfil';
     {perfil.linkedin && (
       <li><span class="clave">linkedin</span> <a href={perfil.linkedin} target="_blank" rel="noopener">{perfil.linkedin.replace('https://', '')}</a></li>
     )}
-    <li><span class="clave">ubicación</span> {perfil.ubicacion}</li>
+    <li><span class="clave">{t('contacto.ubicacion')}</span> {perfilTextos[lang].ubicacion}</li>
   </ul>
 </BaseLayout>

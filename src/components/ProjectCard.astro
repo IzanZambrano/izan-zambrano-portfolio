@@ -1,21 +1,40 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import EstadoBadge from './EstadoBadge.astro';
+import { formatDate, route, useTranslations, type Lang } from '../i18n/ui';
+import type { Proyecto } from '../lib/proyectos';
 
 interface Props {
-  proyecto: CollectionEntry<'proyectos'>;
+  proyecto: Proyecto;
+  lang: Lang;
 }
 
-const { proyecto } = Astro.props;
-const { titulo, descripcion, tecnologias, fecha } = proyecto.data;
+const { proyecto: p, lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Los proyectos escritos a mano tienen página propia; los de GitHub enlazan al repo.
+const externo = p.origen === 'github';
+const href = externo ? p.repo! : `${route('proyectos', lang)}${p.slug}/`;
+const fecha = p.actualizado ?? p.fecha;
 ---
 
-<article class="card">
-  <a href={`/proyectos/${proyecto.id}/`} class="card-link">
-    <p class="card-fecha">{fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'long' })}</p>
-    <h3>{titulo}</h3>
-    <p>{descripcion}</p>
+<article class="card" data-estado={p.estado}>
+  <a href={href} class="card-link" {...(externo ? { target: '_blank', rel: 'noopener' } : {})}>
+    <div class="card-top">
+      <EstadoBadge estado={p.estado} lang={lang} />
+      {externo && (
+        <span class="origen" title={t('proyecto.desdeGithub')}>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          {typeof p.estrellas === 'number' && p.estrellas > 0 && <span>★ {p.estrellas}</span>}
+        </span>
+      )}
+    </div>
+    <h3>{p.titulo}{externo && <span class="ext" aria-hidden="true"> ↗</span>}</h3>
+    <p>{p.descripcion || t('proyecto.sinDescripcion')}</p>
     <ul class="tags">
-      {tecnologias.map((t) => <li>{t}</li>)}
+      {p.tecnologias.map((tec) => <li>{tec}</li>)}
     </ul>
+    <p class="card-fecha">
+      {p.actualizado ? t('proyecto.actualizado') : t('proyecto.creado')}: {formatDate(fecha, lang)}
+    </p>
   </a>
 </article>

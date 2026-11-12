@@ -1,33 +1,45 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { perfil } from '../data/perfil';
+import { perfil, perfilTextos } from '../data/perfil';
+import { otherLang, type Lang } from '../i18n/ui';
 import '../styles/global.css';
 
 interface Props {
+  lang: Lang;
+  /** Ruta de esta misma página en el otro idioma */
+  alt: string;
   title?: string;
   description?: string;
 }
 
-const { title, description = perfil.resumen } = Astro.props;
+const { lang, alt, title, description = perfilTextos[lang].resumen } = Astro.props;
 const fullTitle = title ? `${title} · ${perfil.nombre}` : `${perfil.nombre} · Portfolio`;
+const site = Astro.site ?? Astro.url;
+const actual = new URL(Astro.url.pathname, site).href;
+const alterna = new URL(alt, site).href;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" hreflang={lang} href={actual} />
+    <link rel="alternate" hreflang={otherLang(lang)} href={alterna} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_GB'} />
     <meta name="generator" content={Astro.generator} />
     <title>{fullTitle}</title>
   </head>
   <body>
-    <Header />
+    <Header lang={lang} alt={alt} />
     <main class="container">
       <slot />
     </main>
-    <Footer />
+    <Footer lang={lang} />
   </body>
 </html>

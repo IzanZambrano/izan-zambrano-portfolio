@@ -6,10 +6,13 @@ Mi portfolio personal hecho con [Astro](https://astro.build) y desplegado en un 
 
 ```
 ├── src/
-│   ├── data/perfil.ts          # Tus datos: nombre, email, habilidades…
-│   ├── content/proyectos/      # Un archivo .md por proyecto
-│   ├── pages/                  # Páginas: inicio, proyectos, sobre-mi, contacto, 404
-│   ├── components/             # Header, Footer, tarjeta de proyecto
+│   ├── data/perfil.ts          # Tus datos: nombre, email, habilidades… (ES y EN)
+│   ├── i18n/ui.ts              # Textos de la interfaz en español e inglés
+│   ├── content/proyectos/      # Proyectos en Markdown: es/ y en/
+│   ├── lib/                    # Importación de GitHub y unión de proyectos
+│   ├── views/                  # Contenido de cada página (compartido por los dos idiomas)
+│   ├── pages/                  # Rutas: / y /en/
+│   ├── components/             # Header, Footer, tarjeta de proyecto, etiqueta de estado
 │   ├── layouts/BaseLayout.astro
 │   └── styles/global.css
 ├── public/                     # Archivos estáticos (favicon, imágenes)
@@ -35,15 +38,39 @@ Otros comandos:
 | `npm run build`   | Genera la web estática en `dist/`         |
 | `npm run preview` | Sirve `dist/` en local para comprobarla   |
 
-## Añadir un proyecto
+## Proyectos
 
-Crea un archivo en `src/content/proyectos/mi-proyecto.md`:
+Hay dos formas de que un proyecto aparezca en la web:
+
+### 1. Automática: desde GitHub
+
+Al compilar, la web descarga tus **repositorios públicos** de GitHub (los forks no) y los muestra en la sección de proyectos. El workflow se ejecuta **cada día** y en cada push, así que un repo nuevo aparece como mucho al día siguiente. Para que salga al momento: pestaña **Actions → Build y despliegue → Run workflow**.
+
+Lo que se muestra sale del propio repo (en GitHub, rueda ⚙️ junto a "About"):
+
+| En GitHub                     | En la web                               |
+| ----------------------------- | --------------------------------------- |
+| Description                   | Descripción de la tarjeta               |
+| Website                       | Botón de demo                           |
+| Lenguaje principal + Topics   | Etiquetas de tecnologías                |
+| Topic `en-proceso`            | Estado **en proceso** (por defecto)     |
+| Topic `acabado`               | Estado **acabado**                      |
+| Topic `pausado`               | Estado **pausado**                      |
+| Topic `idea`                  | Estado **idea**                         |
+| Repo archivado / topic `archivado` | Estado **archivado**               |
+| Topic `destacado`             | Aparece en la portada                   |
+| Topic `no-portfolio`          | No aparece en la web                    |
+
+### 2. Manual: con página propia en Markdown
+
+Para proyectos con explicación larga, capturas, etc. Crea `src/content/proyectos/es/mi-proyecto.md` (y opcionalmente la versión en inglés con el **mismo nombre** en `src/content/proyectos/en/`):
 
 ```markdown
 ---
 titulo: Mi proyecto
 descripcion: Resumen corto
 fecha: 2026-11-12
+estado: en-proceso   # en-proceso | acabado | pausado | archivado | idea
 tecnologias: [Linux, Docker]
 repo: https://github.com/IzanZambrano/mi-proyecto
 destacado: true      # true = aparece en la portada
@@ -51,6 +78,16 @@ destacado: true      # true = aparece en la portada
 
 Aquí va la explicación en Markdown.
 ```
+
+Si el Markdown tiene `repo:` apuntando a un repo de GitHub, ese repo no se duplica: se usa la versión Markdown. Si falta la traducción al inglés, la web en inglés muestra la versión en español con un aviso.
+
+## Idiomas
+
+La web está en español (`/`) e inglés (`/en/`), con un selector ES/EN en la cabecera.
+
+- Textos de la interfaz: `src/i18n/ui.ts`
+- Tu presentación, rol y habilidades: `src/data/perfil.ts`
+- La primera visita se muestra en inglés si el navegador no está en español, catalán, gallego o euskera. Después se recuerda el idioma elegido.
 
 ## Despliegue en el VPS
 

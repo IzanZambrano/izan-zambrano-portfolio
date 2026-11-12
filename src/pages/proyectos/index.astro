@@ -1,17 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
-
-const proyectos = (await getCollection('proyectos')).sort(
-  (a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf()
-);
+import Proyectos from '../../views/Proyectos.astro';
 ---
-
-<BaseLayout title="Proyectos">
-  <h1><span class="prompt">$</span> ls -la proyectos/</h1>
-  <p class="lead">Prácticas, proyectos de clase y cosas que monto por mi cuenta.</p>
-  <div class="grid">
-    {proyectos.map((p) => <ProjectCard proyecto={p} />)}
-  </div>
-</BaseLayout>
+<Proyectos lang="es" />

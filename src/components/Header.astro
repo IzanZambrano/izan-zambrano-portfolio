@@ -1,27 +1,54 @@
 ---
-const enlaces = [
-  { href: '/', texto: 'inicio' },
-  { href: '/proyectos/', texto: 'proyectos' },
-  { href: '/sobre-mi/', texto: 'sobre-mi' },
-  { href: '/contacto/', texto: 'contacto' },
+import { languages, otherLang, route, useTranslations, type Lang, type RouteKey } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  alt: string;
+}
+
+const { lang, alt } = Astro.props;
+const t = useTranslations(lang);
+const otro = otherLang(lang);
+
+const enlaces: { key: RouteKey; texto: string }[] = [
+  { key: 'inicio', texto: t('nav.inicio') },
+  { key: 'proyectos', texto: t('nav.proyectos') },
+  { key: 'sobre', texto: t('nav.sobre') },
+  { key: 'contacto', texto: t('nav.contacto') },
 ];
 
 const actual = Astro.url.pathname;
-const esActivo = (href: string) =>
-  href === '/' ? actual === '/' : actual.startsWith(href);
+const esActivo = (key: RouteKey) => {
+  const href = route(key, lang);
+  return key === 'inicio' ? actual === href : actual.startsWith(href);
+};
 ---
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="/" class="logo"><span class="prompt">izan@portfolio</span>:<span class="path">~</span>$</a>
+    <a href={route('inicio', lang)} class="logo"><span class="prompt">izan@portfolio</span>:<span class="path">~</span>$</a>
     <nav>
       <ul>
         {enlaces.map((e) => (
           <li>
-            <a href={e.href} class={esActivo(e.href) ? 'activo' : ''}>./{e.texto}</a>
+            <a href={route(e.key, lang)} class={esActivo(e.key) ? 'activo' : ''}>./{e.texto}</a>
           </li>
         ))}
       </ul>
     </nav>
+    <div class="lang-switch" role="group" aria-label={t('lang.cambiar')}>
+      <span class="lang-actual" aria-current="true">{lang.toUpperCase()}</span>
+      <span class="muted">/</span>
+      <a href={alt} hreflang={otro} lang={otro} title={languages[otro]} data-lang={otro}>{otro.toUpperCase()}</a>
+    </div>
   </div>
 </header>
+
+<script>
+  // Guarda el idioma elegido para la próxima visita.
+  document.querySelectorAll<HTMLAnchorElement>('.lang-switch a[data-lang]').forEach((a) => {
+    a.addEventListener('click', () => {
+      try { localStorage.setItem('lang', a.dataset.lang ?? ''); } catch {}
+    });
+  });
+</script>

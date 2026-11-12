@@ -1,0 +1,12 @@
+---
+import ProyectoDetalle from '../../views/ProyectoDetalle.astro';
+import { getProyectosLocales } from '../../lib/proyectos';
+
+export async function getStaticPaths() {
+  const proyectos = await getProyectosLocales('es');
+  return proyectos.map((proyecto) => ({ params: { slug: proyecto.slug }, props: { proyecto } }));
+}
+
+const { proyecto } = Astro.props;
+---
+<ProyectoDetalle lang="es" proyecto={proyecto} />

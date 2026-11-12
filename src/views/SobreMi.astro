@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { habilidades, perfilTextos } from '../data/perfil';
+import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} alt={route('sobre', otherLang(lang))} title={t('sobre.titulo')}>
+  <h1><span class="prompt">$</span> {t('sobre.cmd')}</h1>
+
+  <div class="prose">
+    {perfilTextos[lang].bio.map((parrafo) => <p>{parrafo}</p>)}
+  </div>
+
+  <h2><span class="prompt">$</span> {t('sobre.habilidades')}</h2>
+  <div class="skills">
+    {habilidades[lang].map((h) => (
+      <div class="skill-group">
+        <h3>{h.grupo}</h3>
+        <ul class="tags">
+          {h.items.map((i) => <li>{i}</li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+</BaseLayout>

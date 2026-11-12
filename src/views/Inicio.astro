@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { perfil, perfilTextos } from '../data/perfil';
+import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+import { getProyectos } from '../lib/proyectos';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const textos = perfilTextos[lang];
+
+const todos = await getProyectos(lang);
+const destacados = todos.filter((p) => p.destacado);
+// Si no hay destacados, se muestran los 3 más recientes.
+const mostrar = (destacados.length ? destacados : todos).slice(0, 6);
+---
+
+<BaseLayout lang={lang} alt={route('inicio', otherLang(lang))}>
+  {lang === 'es' && (
+    <script is:inline>
+      // Primera visita: si el navegador no está en un idioma de España, se muestra la web en inglés.
+      (function () {
+        try {
+          var guardado = localStorage.getItem('lang');
+          if (guardado === 'en') return location.replace('/en/');
+          if (guardado) return;
+          var nav = (navigator.language || 'es').toLowerCase();
+          if (!/^(es|ca|gl|eu)/.test(nav)) location.replace('/en/');
+        } catch (e) {}
+      })();
+    </script>
+  )}
+
+  <section class="hero">
+    <p class="terminal-line"><span class="prompt">$</span> whoami</p>
+    <h1>{perfil.nombre}</h1>
+    <p class="rol">{textos.rol}</p>
+    <p class="lead">{textos.resumen}</p>
+    <div class="acciones">
+      <a class="btn" href={route('proyectos', lang)}>{t('inicio.verProyectos')}</a>
+      <a class="btn btn-sec" href={perfil.github} target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="prompt">$</span> {t('inicio.destacados')}</h2>
+    <div class="grid">
+      {mostrar.map((p) => <ProjectCard proyecto={p} lang={lang} />)}
+    </div>
+    <p><a href={route('proyectos', lang)}>{t('inicio.verTodos')}</a></p>
+  </section>
+</BaseLayout>

@@ -1,0 +1,14 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import type { Estado } from '../lib/estados';
+
+interface Props {
+  estado: Estado;
+  lang: Lang;
+}
+
+const { estado, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<span class={`estado estado-${estado}`}><span class="punto" aria-hidden="true"></span>{t(`estado.${estado}`)}</span>
