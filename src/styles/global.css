@@ -28,7 +28,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { color-scheme: dark; }
+html { color-scheme: dark; scroll-padding-top: 5rem; }
 [data-theme='light'] { color-scheme: light; }
 
 body {
@@ -58,7 +58,7 @@ h2 { font-size: 1.3rem; margin-top: 3rem; }
 .lead { color: var(--muted); font-size: 1.1rem; max-width: 65ch; }
 
 /* Header */
-.site-header { border-bottom: 1px solid var(--borde); background: var(--bg-soft); }
+.site-header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--borde); background: var(--bg-soft); }
 .header-inner { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; padding-block: 1rem; }
 .logo { font-family: var(--mono); color: var(--texto); font-weight: 600; }
 .logo .path { color: var(--azul); }
