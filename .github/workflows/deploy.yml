@@ -43,7 +43,7 @@ jobs:
     # en Settings → Secrets and variables → Actions → Variables (cuando tengas el VPS listo).
     if: vars.DEPLOY_ENABLED == 'true' && github.event_name != 'pull_request'
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
