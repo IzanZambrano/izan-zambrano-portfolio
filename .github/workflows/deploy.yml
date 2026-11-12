@@ -31,7 +31,7 @@ jobs:
           # Token automático del workflow: evita el límite de peticiones de la API de GitHub.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
