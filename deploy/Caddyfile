@@ -1,26 +1,62 @@
-# Cambia "tudominio.com" por tu dominio real.
-# Caddy pedirá y renovará el certificado HTTPS automáticamente.
-# Mientras no tengas dominio, puedes usar ":80" en lugar del dominio para probar por IP.
+# El dominio y el email se leen del archivo .env (variables DOMINIO y EMAIL_ACME).
+# Caddy pide y renueva los certificados HTTPS automáticamente.
+#
+# Necesitas estos registros DNS apuntando a la IP del VPS:
+#   A  tudominio.com
+#   A  www.tudominio.com
+#   A  status.tudominio.com
+#   A  stats.tudominio.com
 
-tudominio.com, www.tudominio.com {
+{
+	email {$EMAIL_ACME}
+}
+
+# Cabeceras de seguridad comunes a todos los sitios
+(seguridad) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+		-Server
+	}
+}
+
+# ── Web principal ────────────────────────────────────────────────────────────
+{$DOMINIO} {
+	import seguridad
 	root * /srv
 	encode zstd gzip
 	file_server
+
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://stats.{$DOMINIO}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://formspree.io https://stats.{$DOMINIO}; form-action 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+
+	@assets path /_astro/* /og-*.png /favicon.svg
+	header @assets Cache-Control "public, max-age=31536000, immutable"
 
 	handle_errors {
 		@404 expression {http.error.status_code} == 404
 		rewrite @404 /404.html
 		file_server
 	}
+}
 
-	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains"
-		X-Content-Type-Options "nosniff"
-		X-Frame-Options "DENY"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		-Server
-	}
+# www → sin www
+www.{$DOMINIO} {
+	redir https://{$DOMINIO}{uri} permanent
+}
 
-	@assets path /_astro/*
-	header @assets Cache-Control "public, max-age=31536000, immutable"
+# ── Página de estado (Uptime Kuma) ───────────────────────────────────────────
+status.{$DOMINIO} {
+	import seguridad
+	encode zstd gzip
+	reverse_proxy uptime-kuma:3001
+}
+
+# ── Analítica (Umami) ────────────────────────────────────────────────────────
+stats.{$DOMINIO} {
+	import seguridad
+	encode zstd gzip
+	reverse_proxy umami:3000
 }

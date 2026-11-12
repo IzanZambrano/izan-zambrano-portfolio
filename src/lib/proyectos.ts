@@ -2,7 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n/ui';
 import { perfil } from '../data/perfil';
-import { getRepos } from './github';
+import { getRepos, type RepoGitHub } from './github';
 import { TOPIC_A_ESTADO, TOPIC_DESTACADO, TOPIC_OCULTAR, type Estado } from './estados';
 
 export interface Proyecto {
@@ -21,6 +21,7 @@ export interface Proyecto {
   /** true si es la versión en español mostrada en la web en inglés por falta de traducción */
   sinTraducir?: boolean;
   entry?: CollectionEntry<'proyectos'>;
+  repoGitHub?: RepoGitHub;
 }
 
 const normalizar = (url: string) => url.toLowerCase().replace(/\/+$/, '').replace(/\.git$/, '');
@@ -64,11 +65,13 @@ export async function getProyectosLocales(lang: Lang): Promise<Proyecto[]> {
 async function getProyectosGitHub(locales: Proyecto[]): Promise<Proyecto[]> {
   const repos = await getRepos(perfil.githubUser);
   const yaIncluidos = new Set(locales.filter((p) => p.repo).map((p) => normalizar(p.repo!)));
+  const slugsLocales = new Set(locales.map((p) => p.slug.toLowerCase()));
 
   return repos
     .filter((r) => !r.fork && !r.private)
     .filter((r) => r.name.toLowerCase() !== perfil.githubUser.toLowerCase()) // repo del perfil
     .filter((r) => !yaIncluidos.has(normalizar(r.html_url)))
+    .filter((r) => !slugsLocales.has(r.name.toLowerCase()))
     .filter((r) => !(r.topics ?? []).some((t) => TOPIC_OCULTAR.includes(t)))
     .map((r) => {
       const topics = r.topics ?? [];
@@ -79,7 +82,7 @@ async function getProyectosGitHub(locales: Proyecto[]): Promise<Proyecto[]> {
         ...topics.filter((t) => !TOPIC_A_ESTADO[t] && !TOPIC_DESTACADO.includes(t)),
       ];
       return {
-        slug: r.name,
+        slug: r.name.toLowerCase(),
         titulo: r.name.replace(/[-_]+/g, ' '),
         descripcion: r.description ?? '',
         estado,
@@ -91,6 +94,7 @@ async function getProyectosGitHub(locales: Proyecto[]): Promise<Proyecto[]> {
         destacado: topics.some((t) => TOPIC_DESTACADO.includes(t)),
         origen: 'github' as const,
         estrellas: r.stargazers_count,
+        repoGitHub: r,
       };
     });
 }

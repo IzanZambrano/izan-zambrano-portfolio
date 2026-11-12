@@ -1,9 +1,9 @@
 ---
 import ProyectoDetalle from '../../../views/ProyectoDetalle.astro';
-import { getProyectosLocales } from '../../../lib/proyectos';
+import { getProyectos } from '../../../lib/proyectos';
 
 export async function getStaticPaths() {
-  const proyectos = await getProyectosLocales('en');
+  const proyectos = await getProyectos('en');
   return proyectos.map((proyecto) => ({ params: { slug: proyecto.slug }, props: { proyecto } }));
 }
 

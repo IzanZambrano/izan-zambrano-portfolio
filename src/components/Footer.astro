@@ -1,18 +1,27 @@
 ---
 import { perfil } from '../data/perfil';
-import { useTranslations, type Lang } from '../i18n/ui';
+import { route, useTranslations, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
 }
 
-const t = useTranslations(Astro.props.lang);
+const { lang } = Astro.props;
+const t = useTranslations(lang);
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="container footer-inner">
     <p>© {year} {perfil.nombre}</p>
-    <p class="muted">{t('footer.hecho')}</p>
+    <p class="muted">
+      <a href={route('infra', lang)}>{t('footer.hecho')}</a>
+      {perfil.statusUrl && (
+        <>
+          {' · '}
+          <a href={perfil.statusUrl} target="_blank" rel="noopener" class="status-link"><span class="punto-ok" aria-hidden="true"></span>{t('contacto.estado')}</a>
+        </>
+      )}
+    </p>
   </div>
 </footer>

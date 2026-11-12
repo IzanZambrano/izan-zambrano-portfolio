@@ -3,6 +3,8 @@ name: Build y despliegue
 on:
   push:
     branches: [main]
+  # Las Pull Requests (p. ej. las de Dependabot) solo compilan, no despliegan.
+  pull_request:
   # Se recompila cada día a las 06:00 (hora de España en invierno) para importar
   # los repositorios nuevos o actualizados de GitHub.
   schedule:
@@ -39,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     # El despliegue solo se ejecuta cuando hayas creado la variable DEPLOY_ENABLED=true
     # en Settings → Secrets and variables → Actions → Variables (cuando tengas el VPS listo).
-    if: vars.DEPLOY_ENABLED == 'true'
+    if: vars.DEPLOY_ENABLED == 'true' && github.event_name != 'pull_request'
     steps:
       - uses: actions/download-artifact@v4
         with:

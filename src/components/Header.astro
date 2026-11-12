@@ -14,6 +14,7 @@ const enlaces: { key: RouteKey; texto: string }[] = [
   { key: 'inicio', texto: t('nav.inicio') },
   { key: 'proyectos', texto: t('nav.proyectos') },
   { key: 'sobre', texto: t('nav.sobre') },
+  { key: 'infra', texto: t('nav.infra') },
   { key: 'contacto', texto: t('nav.contacto') },
 ];
 
@@ -36,15 +37,28 @@ const esActivo = (key: RouteKey) => {
         ))}
       </ul>
     </nav>
+    <div class="header-tools">
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label={t('tema.cambiar')} title={t('tema.cambiar')}>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
     <div class="lang-switch" role="group" aria-label={t('lang.cambiar')}>
       <span class="lang-actual" aria-current="true">{lang.toUpperCase()}</span>
       <span class="muted">/</span>
       <a href={alt} hreflang={otro} lang={otro} title={languages[otro]} data-lang={otro}>{otro.toUpperCase()}</a>
     </div>
+    </div>
   </div>
 </header>
 
 <script>
+  // Tema claro / oscuro (el valor inicial lo pone un script en <head> para evitar parpadeos).
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const nuevo = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = nuevo;
+    try { localStorage.setItem('theme', nuevo); } catch {}
+  });
+
   // Guarda el idioma elegido para la próxima visita.
   document.querySelectorAll<HTMLAnchorElement>('.lang-switch a[data-lang]').forEach((a) => {
     a.addEventListener('click', () => {

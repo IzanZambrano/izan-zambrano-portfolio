@@ -1,5 +1,12 @@
 # Se ejecuta en el VPS, dentro de ~/portfolio/
+#   cp .env.example .env   # y rellena los valores
 #   docker compose up -d
+#
+# Servicios:
+#   caddy       → web (tudominio.com), HTTPS automático y proxy de los demás servicios
+#   uptime-kuma → monitorización y página de estado (status.tudominio.com)
+#   umami + db  → analítica sin cookies (stats.tudominio.com)
+
 services:
   caddy:
     image: caddy:2-alpine
@@ -9,12 +16,62 @@ services:
       - "80:80"
       - "443:443"
       - "443:443/udp"
+    environment:
+      DOMINIO: ${DOMINIO}
+      EMAIL_ACME: ${EMAIL_ACME}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./site:/srv:ro          # aquí copia GitHub Actions la carpeta dist/
       - caddy_data:/data        # certificados HTTPS
       - caddy_config:/config
+    networks: [web]
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: portfolio-uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma:/app/data
+    networks: [web]
+    # Sin "ports": solo es accesible a través de Caddy
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: portfolio-umami
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@umami-db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      DISABLE_TELEMETRY: 1
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    networks: [web, umami]
+
+  umami-db:
+    image: postgres:16-alpine
+    container_name: portfolio-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - umami_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [umami]   # red interna: la base de datos no es accesible desde Caddy ni desde fuera
 
 volumes:
   caddy_data:
   caddy_config:
+  uptime_kuma:
+  umami_db:
+
+networks:
+  web:
+  umami:
+    internal: true

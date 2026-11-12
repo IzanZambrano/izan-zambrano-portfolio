@@ -1,0 +1,20 @@
+---
+import type { Hito } from '../data/perfil';
+
+interface Props {
+  items: Hito[];
+}
+
+const { items } = Astro.props;
+---
+
+<ol class="timeline">
+  {items.map((h) => (
+    <li>
+      <span class="timeline-periodo">{h.periodo}</span>
+      <h3>{h.titulo}</h3>
+      <p class="muted">{h.lugar}</p>
+      {h.detalle && <p>{h.detalle}</p>}
+    </li>
+  ))}
+</ol>

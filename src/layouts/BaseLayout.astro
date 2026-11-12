@@ -2,7 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { perfil, perfilTextos } from '../data/perfil';
-import { otherLang, type Lang } from '../i18n/ui';
+import { otherLang, useTranslations, type Lang } from '../i18n/ui';
 import '../styles/global.css';
 
 interface Props {
@@ -11,13 +11,19 @@ interface Props {
   alt: string;
   title?: string;
   description?: string;
+  /** Imagen para compartir en redes (ruta dentro de /public) */
+  image?: string;
 }
 
-const { lang, alt, title, description = perfilTextos[lang].resumen } = Astro.props;
+const { lang, alt, title, description = perfilTextos[lang].resumen, image = `/og-${lang}.png` } = Astro.props;
+const t = useTranslations(lang);
 const fullTitle = title ? `${title} · ${perfil.nombre}` : `${perfil.nombre} · Portfolio`;
 const site = Astro.site ?? Astro.url;
 const actual = new URL(Astro.url.pathname, site).href;
 const alterna = new URL(alt, site).href;
+const esUrl = lang === 'es' ? actual : alterna;
+const imagen = new URL(image, site).href;
+const { umami } = perfil;
 ---
 
 <!doctype html>
@@ -26,18 +32,45 @@ const alterna = new URL(alt, site).href;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="author" content={perfil.nombre} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={actual} />
     <link rel="alternate" hreflang={lang} href={actual} />
     <link rel="alternate" hreflang={otherLang(lang)} href={alterna} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={perfil.nombre} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
+    <meta property="og:url" content={actual} />
+    <meta property="og:image" content={imagen} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>
+      // Aplica el tema guardado (o el del sistema) antes de pintar la página.
+      (function () {
+        var tema;
+        try { tema = localStorage.getItem('theme'); } catch (e) {}
+        if (!tema) tema = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = tema;
+      })();
+    </script>
+    {umami.src && umami.websiteId && (
+      <script is:inline defer src={umami.src} data-website-id={umami.websiteId}></script>
+    )}
     <meta name="generator" content={Astro.generator} />
     <title>{fullTitle}</title>
   </head>
   <body>
+    <a class="skip-link" href="#contenido">{t('nav.saltar')}</a>
     <Header lang={lang} alt={alt} />
-    <main class="container">
+    <main class="container" id="contenido">
       <slot />
     </main>
     <Footer lang={lang} />

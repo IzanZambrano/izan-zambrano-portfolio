@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { habilidades, perfilTextos } from '../data/perfil';
+import Avatar from '../components/Avatar.astro';
+import Timeline from '../components/Timeline.astro';
+import { certificaciones, experiencia, formacion, habilidades, idiomas, perfilTextos } from '../data/perfil';
 import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+import { getCv } from '../lib/cv';
 
 interface Props {
   lang: Lang;
@@ -9,14 +12,53 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const cv = getCv(lang);
+const exp = experiencia[lang].length ? experiencia[lang] : experiencia.es;
+const form = formacion[lang].length ? formacion[lang] : formacion.es;
+const idi = idiomas[lang].length ? idiomas[lang] : idiomas.es;
 ---
 
 <BaseLayout lang={lang} alt={route('sobre', otherLang(lang))} title={t('sobre.titulo')}>
   <h1><span class="prompt">$</span> {t('sobre.cmd')}</h1>
 
-  <div class="prose">
-    {perfilTextos[lang].bio.map((parrafo) => <p>{parrafo}</p>)}
+  <div class="sobre-intro">
+    <Avatar size={120} />
+    <div class="prose">
+      {perfilTextos[lang].bio.map((parrafo) => <p>{parrafo}</p>)}
+      {cv && <p><a class="btn" href={cv} download>{t('inicio.cv')}</a></p>}
+    </div>
   </div>
+
+  {exp.length > 0 && (
+    <section>
+      <h2><span class="prompt">$</span> {t('sobre.experiencia')}</h2>
+      <Timeline items={exp} />
+    </section>
+  )}
+
+  {form.length > 0 && (
+    <section>
+      <h2><span class="prompt">$</span> {t('sobre.formacion')}</h2>
+      <Timeline items={form} />
+    </section>
+  )}
+
+  {certificaciones.length > 0 && (
+    <section>
+      <h2><span class="prompt">$</span> {t('sobre.certificaciones')}</h2>
+      <ul class="certs">
+        {certificaciones.map((c) => (
+          <li class="cert">
+            <div>
+              <strong>{c.nombre}</strong>
+              <span class="muted">{c.entidad} · {c.anio}</span>
+            </div>
+            {c.url && <a href={c.url} target="_blank" rel="noopener">{t('sobre.verCredencial')} ↗</a>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 
   <h2><span class="prompt">$</span> {t('sobre.habilidades')}</h2>
   <div class="skills">
@@ -29,4 +71,13 @@ const t = useTranslations(lang);
       </div>
     ))}
   </div>
+
+  {idi.length > 0 && (
+    <section>
+      <h2><span class="prompt">$</span> {t('sobre.idiomas')}</h2>
+      <ul class="contacto">
+        {idi.map((i) => <li><span class="clave">{i.idioma}</span> {i.nivel}</li>)}
+      </ul>
+    </section>
+  )}
 </BaseLayout>

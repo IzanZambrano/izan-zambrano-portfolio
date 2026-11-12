@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EstadoBadge from '../components/EstadoBadge.astro';
 import { formatDate, otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+import { getReadmeHtml } from '../lib/github';
 import type { Proyecto } from '../lib/proyectos';
 
 interface Props {
@@ -12,19 +13,24 @@ interface Props {
 
 const { lang, proyecto: p } = Astro.props;
 const t = useTranslations(lang);
-const { Content } = await render(p.entry!);
 const alt = `${route('proyectos', otherLang(lang))}${p.slug}/`;
+
+// Proyecto en Markdown → se renderiza su contenido. Repo de GitHub → se muestra su README.
+const Content = p.entry ? (await render(p.entry)).Content : null;
+const readme = !p.entry && p.repoGitHub ? await getReadmeHtml(p.repoGitHub) : null;
 ---
 
-<BaseLayout lang={lang} alt={alt} title={p.titulo} description={p.descripcion}>
+<BaseLayout lang={lang} alt={alt} title={p.titulo} description={p.descripcion || undefined}>
   <article class="proyecto">
     <p><a href={route('proyectos', lang)}>{t('proyecto.volver')}</a></p>
     <h1>{p.titulo}</h1>
     <div class="meta">
       <EstadoBadge estado={p.estado} lang={lang} />
-      <span class="card-fecha">{formatDate(p.fecha, lang, true)}</span>
+      <span class="card-fecha">{t('proyecto.creado')}: {formatDate(p.fecha, lang, true)}</span>
+      {p.actualizado && <span class="card-fecha">{t('proyecto.actualizado')}: {formatDate(p.actualizado, lang, true)}</span>}
+      {p.origen === 'github' && typeof p.estrellas === 'number' && p.estrellas > 0 && <span class="card-fecha">★ {p.estrellas}</span>}
     </div>
-    <p class="lead">{p.descripcion}</p>
+    {p.descripcion && <p class="lead">{p.descripcion}</p>}
     <ul class="tags">
       {p.tecnologias.map((tec) => <li>{tec}</li>)}
     </ul>
@@ -32,9 +38,24 @@ const alt = `${route('proyectos', otherLang(lang))}${p.slug}/`;
       {p.repo && <a class="btn" href={p.repo} target="_blank" rel="noopener">{t('proyecto.codigo')}</a>}
       {p.demo && <a class="btn btn-sec" href={p.demo} target="_blank" rel="noopener">{t('proyecto.demo')}</a>}
     </div>
+
     {p.sinTraducir && <p class="aviso">{t('proyecto.traduccionPendiente')}</p>}
-    <div class="prose" lang={p.sinTraducir ? 'es' : lang}>
-      <Content />
-    </div>
+
+    {Content && (
+      <div class="prose" lang={p.sinTraducir ? 'es' : lang}>
+        <Content />
+      </div>
+    )}
+
+    {p.origen === 'github' && (
+      readme ? (
+        <section class="readme">
+          <p class="readme-titulo"><span class="prompt">$</span> cat README.md</p>
+          <div class="prose" set:html={readme} />
+        </section>
+      ) : (
+        <p class="muted">{t('proyecto.sinReadme')}</p>
+      )
+    )}
   </article>
 </BaseLayout>

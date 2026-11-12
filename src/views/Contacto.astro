@@ -9,18 +9,84 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const conFormulario = Boolean(perfil.formspreeId);
 ---
 
 <BaseLayout lang={lang} alt={route('contacto', otherLang(lang))} title={t('contacto.titulo')}>
   <h1><span class="prompt">$</span> {t('contacto.cmd')}</h1>
   <p class="lead">{t('contacto.lead')}</p>
 
+  {conFormulario && (
+    <form
+      class="form-contacto"
+      id="form-contacto"
+      action={`https://formspree.io/f/${perfil.formspreeId}`}
+      method="POST"
+      data-ok={t('contacto.form.ok')}
+      data-error={t('contacto.form.error')}
+      data-enviando={t('contacto.form.enviando')}
+    >
+      <label>
+        {t('contacto.form.nombre')}
+        <input type="text" name="name" autocomplete="name" required maxlength="100" />
+      </label>
+      <label>
+        {t('contacto.form.email')}
+        <input type="email" name="email" autocomplete="email" required maxlength="200" />
+      </label>
+      <label>
+        {t('contacto.form.mensaje')}
+        <textarea name="message" rows="6" required maxlength="5000"></textarea>
+      </label>
+      <!-- Campo trampa para bots: las personas no lo ven -->
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="trampa" aria-hidden="true" />
+      <input type="hidden" name="_language" value={lang} />
+      <button type="submit" class="btn">{t('contacto.form.enviar')}</button>
+      <p class="form-estado" role="status" aria-live="polite"></p>
+    </form>
+  )}
+
+  {conFormulario && <p class="muted">{t('contacto.o')}</p>}
   <ul class="contacto">
-    <li><span class="clave">email</span> <a href={`mailto:${perfil.email}`}>{perfil.email}</a></li>
+    {perfil.email && <li><span class="clave">email</span> <a href={`mailto:${perfil.email}`}>{perfil.email}</a></li>}
     <li><span class="clave">github</span> <a href={perfil.github} target="_blank" rel="noopener">{perfil.github.replace('https://', '')}</a></li>
     {perfil.linkedin && (
-      <li><span class="clave">linkedin</span> <a href={perfil.linkedin} target="_blank" rel="noopener">{perfil.linkedin.replace('https://', '')}</a></li>
+      <li><span class="clave">linkedin</span> <a href={perfil.linkedin} target="_blank" rel="noopener">{perfil.linkedin.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, '')}</a></li>
     )}
     <li><span class="clave">{t('contacto.ubicacion')}</span> {perfilTextos[lang].ubicacion}</li>
   </ul>
 </BaseLayout>
+
+<script>
+  // Envía el formulario sin recargar la página.
+  const form = document.getElementById('form-contacto') as HTMLFormElement | null;
+  if (form) {
+    const estado = form.querySelector<HTMLElement>('.form-estado')!;
+    const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const textoBoton = boton.textContent;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      boton.disabled = true;
+      boton.textContent = form.dataset.enviando ?? '…';
+      estado.className = 'form-estado';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        estado.textContent = form.dataset.ok ?? '';
+        estado.classList.add('ok');
+      } catch {
+        estado.textContent = form.dataset.error ?? '';
+        estado.classList.add('error');
+      } finally {
+        boton.disabled = false;
+        boton.textContent = textoBoton;
+      }
+    });
+  }
+</script>

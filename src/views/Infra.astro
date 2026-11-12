@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { perfil } from '../data/perfil';
+import { otherLang, route, useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const c = {
+  es: {
+    lead: 'Este portfolio es también un proyecto de sistemas. Aquí explico cómo se construye, se despliega y se protege.',
+    flujo: 'git log --flujo',
+    pasos: [
+      ['git push', 'Subo cambios a la rama main o creo un repo nuevo en GitHub.'],
+      ['GitHub Actions', 'Instala dependencias, descarga mis repos por la API de GitHub y compila la web con Astro. También se ejecuta cada día de forma programada.'],
+      ['rsync por SSH', 'Copia la carpeta dist/ al VPS con una clave SSH guardada como secret del repositorio.'],
+      ['Caddy en Docker', 'Sirve los archivos estáticos con HTTPS automático (Let’s Encrypt), compresión y cabeceras de seguridad.'],
+    ],
+    stack: 'cat stack.txt',
+    stackItems: [
+      ['Web', 'Astro (HTML estático), CSS propio, sin frameworks de JavaScript'],
+      ['Servidor', 'VPS con Debian/Ubuntu Server'],
+      ['Contenedores', 'Docker + Docker Compose'],
+      ['Servidor web', 'Caddy 2 (reverse proxy y TLS)'],
+      ['CI/CD', 'GitHub Actions (push + cron diario)'],
+      ['Monitorización', 'Uptime Kuma'],
+      ['Analítica', 'Umami autoalojado, sin cookies'],
+      ['Dependencias', 'Dependabot'],
+    ],
+    seguridad: 'sudo ./hardening.sh',
+    segItems: [
+      'Acceso SSH solo con clave; sin contraseña ni login de root.',
+      'Firewall ufw: solo puertos 22, 80 y 443 abiertos.',
+      'fail2ban contra ataques de fuerza bruta.',
+      'HTTPS obligatorio con HSTS y renovación automática de certificados.',
+      'Cabeceras de seguridad: Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy y Permissions-Policy.',
+      'Contenedores con volúmenes de solo lectura para la web.',
+      'Secretos (claves SSH, contraseñas) fuera del código: secrets de GitHub y archivo .env en el servidor.',
+      'Web 100% estática: sin base de datos ni código ejecutándose en el servidor para la web.',
+    ],
+    estado: 'Ver estado de los servicios',
+    codigo: 'Ver el código de esta web',
+  },
+  en: {
+    lead: 'This portfolio is a systems project too. Here is how it is built, deployed and secured.',
+    flujo: 'git log --pipeline',
+    pasos: [
+      ['git push', 'I push changes to the main branch or create a new repository on GitHub.'],
+      ['GitHub Actions', 'Installs dependencies, pulls my repos through the GitHub API and builds the site with Astro. It also runs on a daily schedule.'],
+      ['rsync over SSH', 'Copies the dist/ folder to the VPS using an SSH key stored as a repository secret.'],
+      ['Caddy in Docker', 'Serves the static files with automatic HTTPS (Let’s Encrypt), compression and security headers.'],
+    ],
+    stack: 'cat stack.txt',
+    stackItems: [
+      ['Web', 'Astro (static HTML), hand-written CSS, no JavaScript framework'],
+      ['Server', 'VPS running Debian/Ubuntu Server'],
+      ['Containers', 'Docker + Docker Compose'],
+      ['Web server', 'Caddy 2 (reverse proxy and TLS)'],
+      ['CI/CD', 'GitHub Actions (push + daily cron)'],
+      ['Monitoring', 'Uptime Kuma'],
+      ['Analytics', 'Self-hosted Umami, cookie-free'],
+      ['Dependencies', 'Dependabot'],
+    ],
+    seguridad: 'sudo ./hardening.sh',
+    segItems: [
+      'SSH access with keys only; no passwords and no root login.',
+      'ufw firewall: only ports 22, 80 and 443 open.',
+      'fail2ban against brute-force attacks.',
+      'HTTPS enforced with HSTS and automatic certificate renewal.',
+      'Security headers: Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and Permissions-Policy.',
+      'Containers mount the site as read-only volumes.',
+      'Secrets (SSH keys, passwords) kept out of the code: GitHub secrets and a .env file on the server.',
+      '100% static site: no database and no server-side code running for the website.',
+    ],
+    estado: 'See service status',
+    codigo: 'See the source code of this site',
+  },
+}[lang];
+
+const repoPortfolio = `${perfil.github}/izan-zambrano-portfolio`;
+---
+
+<BaseLayout lang={lang} alt={route('infra', otherLang(lang))} title={t('infra.titulo')} description={c.lead}>
+  <h1><span class="prompt">$</span> {t('infra.titulo')}</h1>
+  <p class="lead">{c.lead}</p>
+
+  <figure class="diagrama">
+    <svg viewBox="0 0 880 200" role="img" aria-label={c.pasos.map((p) => p[0]).join(' → ')}>
+      <defs>
+        <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0L10 5L0 10z" class="d-flecha" />
+        </marker>
+      </defs>
+      {[
+        { x: 10, titulo: lang === 'es' ? 'Tu ordenador' : 'My laptop', sub: 'git push' },
+        { x: 230, titulo: 'GitHub', sub: 'Actions · build' },
+        { x: 450, titulo: 'VPS', sub: 'rsync · SSH' },
+        { x: 670, titulo: 'Caddy', sub: 'Docker · HTTPS' },
+      ].map((n, i) => (
+        <g>
+          <rect x={n.x} y="50" width="200" height="90" rx="10" class="d-caja" />
+          <text x={n.x + 100} y="88" text-anchor="middle" class="d-titulo">{n.titulo}</text>
+          <text x={n.x + 100} y="115" text-anchor="middle" class="d-sub">{n.sub}</text>
+          {i < 3 && <line x1={n.x + 202} y1="95" x2={n.x + 226} y2="95" class="d-linea" marker-end="url(#flecha)" />}
+        </g>
+      ))}
+      <text x="770" y="175" text-anchor="middle" class="d-sub">{lang === 'es' ? '→ visitantes' : '→ visitors'}</text>
+    </svg>
+  </figure>
+
+  <h2><span class="prompt">$</span> {c.flujo}</h2>
+  <ol class="timeline">
+    {c.pasos.map(([titulo, texto]) => (
+      <li>
+        <h3>{titulo}</h3>
+        <p class="muted">{texto}</p>
+      </li>
+    ))}
+  </ol>
+
+  <h2><span class="prompt">$</span> {c.stack}</h2>
+  <ul class="contacto">
+    {c.stackItems.map(([k, v]) => <li><span class="clave">{k}</span> {v}</li>)}
+  </ul>
+
+  <h2><span class="prompt">$</span> {c.seguridad}</h2>
+  <ul class="checklist">
+    {c.segItems.map((s) => <li>{s}</li>)}
+  </ul>
+
+  <div class="acciones">
+    <a class="btn" href={repoPortfolio} target="_blank" rel="noopener">{c.codigo}</a>
+    {perfil.statusUrl && <a class="btn btn-sec" href={perfil.statusUrl} target="_blank" rel="noopener">{c.estado}</a>}
+  </div>
+</BaseLayout>

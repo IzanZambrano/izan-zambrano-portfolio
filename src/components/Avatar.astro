@@ -1,0 +1,18 @@
+---
+import { perfil } from '../data/perfil';
+
+interface Props {
+  size?: number;
+}
+
+const { size = 128 } = Astro.props;
+---
+
+{perfil.foto ? (
+  <img class="avatar" src={perfil.foto} alt={perfil.nombre} width={size} height={size} />
+) : (
+  <svg class="avatar" viewBox="0 0 128 128" width={size} height={size} role="img" aria-label={perfil.nombre}>
+    <rect width="128" height="128" rx="64" class="avatar-bg" />
+    <text x="64" y="64" text-anchor="middle" dominant-baseline="central" class="avatar-txt">{perfil.iniciales}</text>
+  </svg>
+)}
