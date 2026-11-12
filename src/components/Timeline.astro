@@ -13,7 +13,7 @@ const { items } = Astro.props;
     <li>
       <span class="timeline-periodo">{h.periodo}</span>
       <h3>{h.titulo}</h3>
-      <p class="muted">{h.lugar}</p>
+      {h.lugar && <p class="muted">{h.lugar}</p>}
       {h.detalle && <p>{h.detalle}</p>}
     </li>
   ))}
