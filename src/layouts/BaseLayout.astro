@@ -3,6 +3,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { perfil, perfilTextos } from '../data/perfil';
 import { otherLang, useTranslations, type Lang } from '../i18n/ui';
+import { withBase } from '../lib/base';
 import '../styles/global.css';
 
 interface Props {
@@ -22,7 +23,7 @@ const site = Astro.site ?? Astro.url;
 const actual = new URL(Astro.url.pathname, site).href;
 const alterna = new URL(alt, site).href;
 const esUrl = lang === 'es' ? actual : alterna;
-const imagen = new URL(image, site).href;
+const imagen = new URL(withBase(image), site).href;
 const { umami } = perfil;
 ---
 
@@ -34,13 +35,13 @@ const { umami } = perfil;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#161b22" />
     <meta name="author" content={perfil.nombre} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
     <link rel="canonical" href={actual} />
     <link rel="alternate" hreflang={lang} href={actual} />
     <link rel="alternate" hreflang={otherLang(lang)} href={alterna} />
     <link rel="alternate" hreflang="x-default" href={esUrl} />
-    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="sitemap" href={withBase('/sitemap.xml')} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={perfil.nombre} />

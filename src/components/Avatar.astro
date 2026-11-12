@@ -1,4 +1,5 @@
 ---
+import { withBase } from '../lib/base';
 import { perfil } from '../data/perfil';
 
 interface Props {
@@ -9,7 +10,7 @@ const { size = 128 } = Astro.props;
 ---
 
 {perfil.foto ? (
-  <img class="avatar" src={perfil.foto} alt={perfil.nombre} width={size} height={size} />
+  <img class="avatar" src={withBase(perfil.foto)} alt={perfil.nombre} width={size} height={size} />
 ) : (
   <svg class="avatar" viewBox="0 0 128 128" width={size} height={size} role="img" aria-label={perfil.nombre}>
     <rect width="128" height="128" rx="64" class="avatar-bg" />

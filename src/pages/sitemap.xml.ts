@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro';
 import { routes } from '../i18n/ui';
 import { getProyectos } from '../lib/proyectos';
+import { withBase } from '../lib/base';
 
 // Genera /sitemap.xml con todas las páginas en los dos idiomas.
 export const GET: APIRoute = async ({ site }) => {
   const base = site ?? new URL('https://example.com');
-  const url = (path: string) => new URL(path, base).href;
+  const url = (path: string) => new URL(withBase(path), base).href;
 
   const pares: { es: string; en: string }[] = Object.values(routes).map((r) => ({ es: r.es, en: r.en }));
 

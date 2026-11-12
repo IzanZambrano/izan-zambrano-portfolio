@@ -24,15 +24,15 @@ const mostrar = (destacados.length ? destacados : todos).slice(0, 6);
 
 <BaseLayout lang={lang} alt={route('inicio', otherLang(lang))}>
   {lang === 'es' && (
-    <script is:inline>
+    <script is:inline define:vars={{ inicioEn: route('inicio', 'en') }}>
       // Primera visita: si el navegador no está en un idioma de España, se muestra la web en inglés.
       (function () {
         try {
           var guardado = localStorage.getItem('lang');
-          if (guardado === 'en') return location.replace('/en/');
+          if (guardado === 'en') return location.replace(inicioEn);
           if (guardado) return;
           var nav = (navigator.language || 'es').toLowerCase();
-          if (!/^(es|ca|gl|eu)/.test(nav)) location.replace('/en/');
+          if (!/^(es|ca|gl|eu)/.test(nav)) location.replace(inicioEn);
         } catch (e) {}
       })();
     </script>

@@ -39,6 +39,30 @@ jobs:
           name: dist
           path: dist/
 
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist/
+
+  # Publicación en GitHub Pages (https://izanzambrano.github.io/izan-zambrano-portfolio/)
+  # mientras no hay dominio propio ni VPS.
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   deploy:
     needs: build
     runs-on: ubuntu-latest

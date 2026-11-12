@@ -1,3 +1,5 @@
+import { withBase } from '../lib/base';
+
 // Textos de la web en cada idioma. Para cambiar un texto, edítalo aquí.
 export const languages = { es: 'Español', en: 'English' } as const;
 export type Lang = keyof typeof languages;
@@ -159,7 +161,7 @@ export function otherLang(lang: Lang): Lang {
 }
 
 export function route(key: RouteKey, lang: Lang): string {
-  return routes[key][lang];
+  return withBase(routes[key][lang]);
 }
 
 export function formatDate(date: Date, lang: Lang, withDay = false): string {

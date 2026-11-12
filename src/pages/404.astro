@@ -1,14 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { route } from '../i18n/ui';
 ---
-<BaseLayout lang="es" alt="/en/" title="404">
+<BaseLayout lang="es" alt={route('inicio', 'en')} title="404">
   <section class="hero">
     <p class="terminal-line"><span class="prompt">$</span> cd {Astro.url.pathname}</p>
     <h1>404</h1>
     <p class="lead">bash: cd: No existe el archivo o el directorio<br /><span lang="en">No such file or directory</span></p>
     <div class="acciones">
-      <a class="btn" href="/">Volver al inicio</a>
-      <a class="btn btn-sec" href="/en/" lang="en">Back to home</a>
+      <a class="btn" href={route('inicio', 'es')}>Volver al inicio</a>
+      <a class="btn btn-sec" href={route('inicio', 'en')} lang="en">Back to home</a>
     </div>
   </section>
 </BaseLayout>

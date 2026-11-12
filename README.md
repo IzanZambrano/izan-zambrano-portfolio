@@ -2,6 +2,8 @@
 
 Mi portfolio personal hecho con [Astro](https://astro.build) y desplegado en un VPS con Docker, Caddy y GitHub Actions.
 
+**Web:** https://izanzambrano.github.io/izan-zambrano-portfolio/ (GitHub Pages, hasta tener dominio propio)
+
 [![Build y despliegue](https://github.com/IzanZambrano/izan-zambrano-portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/IzanZambrano/izan-zambrano-portfolio/actions/workflows/deploy.yml)
 
 ## Arquitectura
