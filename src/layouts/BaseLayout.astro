@@ -32,9 +32,10 @@ const { umami } = perfil;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0d1117" />
+    <meta name="theme-color" content="#161b22" />
     <meta name="author" content={perfil.nombre} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={actual} />
     <link rel="alternate" hreflang={lang} href={actual} />
     <link rel="alternate" hreflang={otherLang(lang)} href={alterna} />
@@ -59,6 +60,7 @@ const { umami } = perfil;
         try { tema = localStorage.getItem('theme'); } catch (e) {}
         if (!tema) tema = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         document.documentElement.dataset.theme = tema;
+        if (tema === 'light') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f6f8fa');
       })();
     </script>
     {umami.src && umami.websiteId && (

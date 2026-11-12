@@ -13,7 +13,9 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const cv = getCv(lang);
-const exp = experiencia[lang].length ? experiencia[lang] : experiencia.es;
+const todaExp = experiencia[lang].length ? experiencia[lang] : experiencia.es;
+const exp = todaExp.filter((h) => !h.secundaria);
+const otraExp = todaExp.filter((h) => h.secundaria);
 const form = formacion[lang].length ? formacion[lang] : formacion.es;
 const idi = idiomas[lang].length ? idiomas[lang] : idiomas.es;
 ---
@@ -33,6 +35,14 @@ const idi = idiomas[lang].length ? idiomas[lang] : idiomas.es;
     <section>
       <h2><span class="prompt">$</span> {t('sobre.experiencia')}</h2>
       <Timeline items={exp} />
+      {otraExp.length > 0 && (
+        <>
+          <h3 class="otra-exp-titulo">{t('sobre.otraExperiencia')}</h3>
+          <ul class="otra-exp">
+            {otraExp.map((h) => <li><strong>{h.titulo}</strong> · {h.lugar} <span class="muted">({h.periodo})</span></li>)}
+          </ul>
+        </>
+      )}
     </section>
   )}
 

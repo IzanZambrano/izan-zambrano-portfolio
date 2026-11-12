@@ -29,7 +29,7 @@ type Textos = { rol: string; resumen: string; ubicacion: string; bio: string[] }
 
 export const perfilTextos: Record<Lang, Textos> = {
   es: {
-    rol: 'Estudiante de ASIR · IT en ESGroup',
+    rol: 'Estudiante de ASIR · Encargado de IT en ESGroup',
     resumen:
       'Estudiante de segundo curso de ASIR y encargado del departamento de IT en ESGroup. ' +
       'Me apasionan la administración de sistemas, las redes y la ciberseguridad.',
@@ -37,11 +37,11 @@ export const perfilTextos: Record<Lang, Textos> = {
     bio: [
       'Soy estudiante de segundo curso del Ciclo Formativo de Grado Superior en Administración de Sistemas Informáticos en Red (ASIR), con una gran pasión por la informática, la administración de sistemas y las infraestructuras de red.',
       'Cuento con conocimientos prácticos en entornos Linux, administración de servidores, configuración de servicios de red, virtualización y automatización mediante scripts Bash. Me interesa especialmente el ámbito de la ciberseguridad y la administración de infraestructuras IT.',
-      'Actualmente trabajo en el departamento de IT de ESGroup, donde sigo desarrollando mis conocimientos y mi experiencia en el sector tecnológico. Mi objetivo es seguir creciendo profesionalmente y especializarme en sistemas, redes y ciberseguridad.',
+      'Actualmente soy el encargado del departamento de IT de ESGroup, donde sigo desarrollando mis conocimientos y mi experiencia en el sector tecnológico. Mi objetivo es seguir creciendo profesionalmente y especializarme en sistemas, redes y ciberseguridad.',
     ],
   },
   en: {
-    rol: 'Network & Systems Administration student · IT at ESGroup',
+    rol: 'Network & Systems Administration student · Head of IT at ESGroup',
     resumen:
       'Second-year Network and Systems Administration (ASIR) student and head of the IT department at ESGroup. ' +
       "I'm passionate about system administration, networking and cybersecurity.",
@@ -49,7 +49,7 @@ export const perfilTextos: Record<Lang, Textos> = {
     bio: [
       "I'm a second-year student of the Higher Vocational Training Diploma in Network and Systems Administration (ASIR), with a strong passion for IT, system administration and network infrastructure.",
       'I have hands-on experience with Linux environments, server administration, network service configuration, virtualisation and automation with Bash scripting. I am particularly interested in cybersecurity and IT infrastructure management.',
-      "I currently work in the IT department at ESGroup, where I keep building my knowledge and experience in the tech sector. My goal is to keep growing professionally and specialise in systems, networking and cybersecurity.",
+      "I currently head the IT department at ESGroup, where I keep building my knowledge and experience in the tech sector. My goal is to keep growing professionally and specialise in systems, networking and cybersecurity.",
     ],
   },
 };
@@ -79,6 +79,8 @@ export interface Hito {
   lugar: string;
   periodo: string; // p. ej. '2024 – 2026' o '2025 – actualidad'
   detalle?: string;
+  /** Experiencia no técnica: se muestra en una lista compacta aparte. */
+  secundaria?: boolean;
 }
 
 export const formacion: Record<Lang, Hito[]> = {
@@ -128,11 +130,13 @@ export const experiencia: Record<Lang, Hito[]> = {
       titulo: 'Equipo de restaurante',
       lugar: "McDonald's",
       periodo: '2026',
+      secundaria: true,
     },
     {
       titulo: 'Promotor de ventas (campaña Brother)',
       lugar: 'MediaMarkt',
       periodo: '2025 – 2026',
+      secundaria: true,
     },
   ],
   en: [
@@ -146,11 +150,13 @@ export const experiencia: Record<Lang, Hito[]> = {
       titulo: 'Crew member',
       lugar: "McDonald's",
       periodo: '2026',
+      secundaria: true,
     },
     {
       titulo: 'Sales promoter (Brother campaign)',
       lugar: 'MediaMarkt',
       periodo: '2025 – 2026',
+      secundaria: true,
     },
   ],
 };

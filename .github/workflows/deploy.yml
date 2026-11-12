@@ -23,7 +23,10 @@ jobs:
           node-version: 22
 
       - name: Instalar dependencias
-        run: npm install
+        run: npm ci
+
+      - name: Comprobar tipos y plantillas
+        run: npm run check
 
       - name: Compilar la web
         run: npm run build

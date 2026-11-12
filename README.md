@@ -2,6 +2,26 @@
 
 Mi portfolio personal hecho con [Astro](https://astro.build) y desplegado en un VPS con Docker, Caddy y GitHub Actions.
 
+[![Build y despliegue](https://github.com/IzanZambrano/izan-zambrano-portfolio/actions/workflows/deploy.yml/badge.svg)](https://github.com/IzanZambrano/izan-zambrano-portfolio/actions/workflows/deploy.yml)
+
+## Arquitectura
+
+```mermaid
+flowchart LR
+  dev[git push a main] --> gha[GitHub Actions<br/>astro check + build]
+  cron[Cron diario] --> gha
+  gh[API de GitHub<br/>repos públicos] -.-> gha
+  gha -- rsync por SSH --> vps
+
+  subgraph vps[VPS · Docker Compose]
+    caddy[Caddy<br/>HTTPS automático] --> web[Web estática]
+    caddy --> kuma[Uptime Kuma<br/>status.]
+    caddy --> umami[Umami<br/>stats.]
+  end
+
+  user[Visitante] --> caddy
+```
+
 ## Estructura
 
 ```
@@ -37,6 +57,7 @@ Otros comandos:
 | ----------------- | ----------------------------------------- |
 | `npm run build`   | Genera la web estática en `dist/`         |
 | `npm run preview` | Sirve `dist/` en local para comprobarla   |
+| `npm run check`   | Revisa tipos y plantillas (también en CI) |
 
 ## Proyectos
 
